@@ -48,7 +48,7 @@ module swipe {
       while (index--) {
         var el = @slides[index];
         el.style.width = @width + 'px';
-//        el.style.display = 'table-cell';
+        el.style.display = 'table-cell';
         el.style.verticalAlign = 'top';
       }
       @slide(@index, 0); 
