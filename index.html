@@ -1,0 +1,33 @@
+<html>
+<head>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Swipe test</title>
+  <style type="text/css" media="screen">
+  </style>
+</head>
+<body>
+<script type='text/javascript' src='../require/lib/require.js'></script>
+<script type='text/javascript'>
+  require('loader').Loader({ws:'ws://'+location.hostname+':81/',http:location.origin,modules:['../monads/lib/utilities','../monads/lib/monads','../swipe/lib/swipe','../swipe/test/test1']});
+</script>
+<div id='gallery'>
+  <div id='slider'>
+    <ul>
+      <li style='display:block;'><div>1</div></li>
+      <li style='display:none;'><div>2</div></li>
+      <li style='display:none;'><div>3</div></li>
+      <li style='display:none;'><div>4</div></li>
+      <li style='display:none;'><div>5</div></li>
+    </ul>
+  </div>
+  <nav>
+    <span id='position'>
+      <span class='dot'></span>
+      <span class='dot'></span>
+      <span class='dot'></span>
+    </span>
+  </nav>
+</div>
+</body>
+</html>
