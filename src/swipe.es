@@ -163,7 +163,8 @@ module swipe {
           {selector:'#position',style:"text-align: center; font-size: 27px; line-height: 1.3; color: #697279; display: block; position: absolute; top: 0; left: 50%; margin-left: -75px; width: 150px;"},
           {selector:'#gallery nav',style:"border-top: 1px #3A4146 solid; background-image: -webkit-gradient(linear, left top, left bottom, from(#292F34), to(#23282C)); height: 35px; position: relative;"},
           {selector:'#gallery',style:"background:#23282C"},
-          {selector:'.dot',style:"display: inline-block; width:12px;height:12px; border-radius:6px; background-color:#8999A6;"}
+          {selector:'.dot',style:"display: inline-block; width:12px;height:12px; border-radius:6px; background-color:#8999A6;"},
+          {selector:'.active',style:"background-color:#ffffff;"}
         ];
         monads.Styleable(styles).on("load").onstyle();
     })()
