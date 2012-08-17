@@ -1,2 +1,2 @@
 module swipe from 'swipe';
-swipe.Swipe({element:document.getElementById('slider')});
+swipe.Swipe({element:document.getElementById('slider')}).begin();

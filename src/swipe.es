@@ -3,7 +3,7 @@ module swipe {
   module monads from 'monads';
   export class Swipe {
     constructor(properties={element:null,options:{}}) {
-      private callback, container, delay, deltaX, element, index, interval, isScrolling, length, options, slides, speed, start, width;
+      private callback, container, delay, deltaX, element, index, interval, isScrolling, length, options, slider, slides, speed, start, width;
       @setup = @setup.bind(this);
       @onstart = @onstart.bind(this);
       @onmove = @onmove.bind(this);
@@ -31,6 +31,7 @@ module swipe {
       window.addEventListener('resize', @setup, false);
     }
     setup() {
+//      monads.DOMable({tagName:'nav'}).on('load').insert(document.body);
       @slides = @element.children;
       @length = @slides.length;
       if (@length < 2) {
@@ -115,7 +116,7 @@ module swipe {
       // reset deltaX
       @deltaX = 0;
       // set transition time to 0 for 1-to-1 touch movement
-      @element.style.MozTransitionDuration = @element.style.webkitTransitionDuration = 0;
+      @element.style.webkitTransitionDuration = 0;
       e.stopPropagation();
     }
     onmove(e) {
@@ -143,25 +144,15 @@ module swipe {
             : 1 );                                          // no resistance if false
         // translate immediately 1-to-1
         @element.style.webkitTransform = 'translate3d(' + (@deltaX - @index * @width) + 'px,0,0)';
-        
         e.stopPropagation();
       }
-  
     }
     onend(e) {
       // determine if slide attempt triggers next/prev slide
-      var isValidSlide = 
-            Number(new Date()) - @start.time < 250      // if slide duration is less than 250ms
-            && Math.abs(@deltaX) > 20                   // and if slide amt is greater than 20px
-            || Math.abs(@deltaX) > @width/2,        // or if slide amt is greater than half the width
-      // determine if slide attempt is past start and end
-          isPastBounds = 
-            !@index && @deltaX > 0                          // if first slide and slide amt is greater than 0
-            || @index == @length - 1 && @deltaX < 0;    // or if last slide and slide amt is less than 0
-  
-      // if not scrolling vertically
+      var isValidSlide = Number(new Date()) - @start.time < 250 && Math.abs(@deltaX) > 20 || 
+        Math.abs(@deltaX) > @width/2,
+        isPastBounds = !@index && @deltaX > 0 || @index == @length - 1 && @deltaX < 0;
       if (!@isScrolling) {
-        // call slide function with slide end value based on isValidSlide and isPastBounds tests
         @slide( @index + ( isValidSlide && !isPastBounds ? (@deltaX < 0 ? 1 : -1) : 0 ), @speed );
       }
     }
@@ -172,7 +163,6 @@ module swipe {
           {selector:'#position',style:"text-align: center; font-size: 27px; line-height: 1.3; color: #697279; display: block; position: absolute; top: 0; left: 50%; margin-left: -75px; width: 150px;"},
           {selector:'#gallery nav',style:"border-top: 1px #3A4146 solid; background-image: -webkit-gradient(linear, left top, left bottom, from(#292F34), to(#23282C)); height: 35px; position: relative;"},
           {selector:'#gallery',style:"background:#23282C"},
-          {selector:'#slider',style:"padding:13px 0"},
           {selector:'.dot',style:"display: inline-block; width:12px;height:12px; border-radius:6px; background-color:#8999A6;"}
         ];
         monads.Styleable(styles).on("load").onstyle();
