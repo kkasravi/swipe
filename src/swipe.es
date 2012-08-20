@@ -3,7 +3,7 @@ module swipe {
   module monads from 'monads';
   export class Swipe {
     constructor(properties={element:null,options:{}}) {
-      private callback, container, delay, deltaX, element, index, interval, isScrolling, length, options, slider, slides, speed, start, width;
+      private callback, delay, deltaX, index, interval, isScrolling, length, options, slider, slides, speed, start, ul, width;
       @setup = @setup.bind(this);
       @onstart = @onstart.bind(this);
       @onmove = @onmove.bind(this);
@@ -17,34 +17,44 @@ module swipe {
       @speed = @options.speed || 300;
       @callback = @options.callback || function() {};
       @delay = @options.auto || 0;
-      @container = properties.element;
-      @element = @container.children[0]; // the slide pane
-      @container.style.overflow = 'hidden';
-      @element.style.listStyle = 'none';
+      @slider = properties.element;
+      @ul = @slider.children[0];
+      @slider.style.overflow = 'hidden';
+      @ul.style.listStyle = 'none';
       @setup();
       @begin();
-      @element.addEventListener('touchstart', @onstart, false);
-      @element.addEventListener('touchmove', @onmove, false);
-      @element.addEventListener('touchend', @onend, false);
-      @element.addEventListener('webkitTransitionEnd', @ontransitionend, false);
-      @element.addEventListener('transitionend', @ontransitionend, false);
+      @ul.addEventListener('touchstart', @onstart, false);
+      @ul.addEventListener('touchmove', @onmove, false);
+      @ul.addEventListener('touchend', @onend, false);
+      @ul.addEventListener('webkitTransitionEnd', @ontransitionend, false);
+      @ul.addEventListener('transitionend', @ontransitionend, false);
       window.addEventListener('resize', @setup, false);
     }
     setup() {
-//      monads.DOMable({tagName:'nav'}).on('load').insert(document.body);
-      @slides = @element.children;
+      monads.DOMable({tagName:'nav'}).on('load').insert(@slider.parentNode).add(
+        monads.DOMable({tagName:'span'}).on('load').attributes({id:'position'}).add(
+          monads.DOMable({tagName:'span'}).on('load').attributes({'class':'dot active'})
+        ).add(
+          monads.DOMable({tagName:'span'}).on('load').attributes({'class':'dot'})
+        ).add(
+          monads.DOMable({tagName:'span'}).on('load').attributes({'class':'dot'})
+        ).add(
+          monads.DOMable({tagName:'span'}).on('load').attributes({'class':'dot'})
+        )
+      );
+      @slides = @ul.children;
       @length = @slides.length;
       if (@length < 2) {
         return null;
       }
-      @width = ("getBoundingClientRect" in @container) ? 
-        @container.getBoundingClientRect().width : @container.offsetWidth;
+      @width = ("getBoundingClientRect" in @slider) ? 
+        @slider.getBoundingClientRect().width : @slider.offsetWidth;
       if (!@width) {
         return null;
       }
-      @container.style.visibility = 'hidden';
+      @slider.style.visibility = 'hidden';
       // dynamic css
-      @element.style.width = (@slides.length * @width) + 'px';
+      @ul.style.width = (@slides.length * @width) + 'px';
       var index = @slides.length;
       while (index--) {
         var el = @slides[index];
@@ -53,10 +63,10 @@ module swipe {
         el.style.verticalAlign = 'top';
       }
       @slide(@index, 0); 
-      @container.style.visibility = 'visible';
+      @slider.style.visibility = 'visible';
     }
     slide(index, duration) {
-      var style = @element.style;
+      var style = @ul.style;
       if (duration == undefined) {
           duration = @speed;
       }
@@ -116,24 +126,18 @@ module swipe {
       // reset deltaX
       @deltaX = 0;
       // set transition time to 0 for 1-to-1 touch movement
-      @element.style.webkitTransitionDuration = 0;
+      @ul.style.webkitTransitionDuration = 0;
       e.stopPropagation();
     }
     onmove(e) {
-      // ensure swiping with one touch and not pinching
       if(e.touches.length > 1 || e.scale && e.scale !== 1) return;
       @deltaX = e.touches[0].pageX - @start.pageX;
-      // determine if scrolling test has run - one time test
       if ( typeof @isScrolling === 'undefined') {
         @isScrolling = !!( @isScrolling || Math.abs(@deltaX) < Math.abs(e.touches[0].pageY - @start.pageY) );
       }
-      // if user is not trying to scroll vertically
       if (!@isScrolling) {
-        // prevent native scrolling 
         e.preventDefault();
-        // cancel slideshow
         clearTimeout(@interval);
-        // increase resistance if first or last slide
         @deltaX = 
           @deltaX / 
             ( (!@index && @deltaX > 0               // if first slide and sliding left
@@ -143,7 +147,7 @@ module swipe {
             ( Math.abs(@deltaX) / @width + 1 )      // determine resistance level
             : 1 );                                          // no resistance if false
         // translate immediately 1-to-1
-        @element.style.webkitTransform = 'translate3d(' + (@deltaX - @index * @width) + 'px,0,0)';
+        @ul.style.webkitTransform = 'translate3d(' + (@deltaX - @index * @width) + 'px,0,0)';
         e.stopPropagation();
       }
     }
@@ -160,10 +164,10 @@ module swipe {
         var styles = [
           {selector:'.swipe',style:"padding-bottom:20px;"},
           {selector:'.swipe li div, .swipe div div div',style:"margin:0 10px; padding:50px 10px; background:#1db1ff; font-weight:bold; color:#fff; font-size:20px; text-align:center;"},
-          {selector:'#position',style:"text-align: center; font-size: 27px; line-height: 1.3; color: #697279; display: block; position: absolute; top: 0; left: 50%; margin-left: -75px; width: 150px;"},
+          {selector:'#position',style:"text-align: center; font-size: 27px; line-height: 1.3; color: #697279;display:block; position: absolute; top: 0; left: 50%; margin-left: -75px; width: 150px;"},
           {selector:'#gallery nav',style:"border-top: 1px #3A4146 solid; background-image: -webkit-gradient(linear, left top, left bottom, from(#292F34), to(#23282C)); height: 35px; position: relative;"},
           {selector:'#gallery',style:"background:#23282C"},
-          {selector:'.dot',style:"display: inline-block; width:12px;height:12px; border-radius:6px; background-color:#8999A6;"},
+          {selector:'.dot',style:"display: inline-block;margin:10px 3px;width:12px;height:12px;border-radius:6px;background-color:#8999A6;"},
           {selector:'.active',style:"background-color:#ffffff;"}
         ];
         monads.Styleable(styles).on("load").onstyle();
